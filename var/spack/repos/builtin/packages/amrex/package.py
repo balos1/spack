@@ -51,7 +51,8 @@ class Amrex(CMakePackage):
     depends_on('mpi', when='+mpi')
     depends_on('sundials@3.2.1: +ARKODE +CVODE', when='@develop +sundials')
     depends_on('python@2.7:', type='build')
-    depends_on('cmake@3.5:',  type='build')
+    depends_on('cmake@3.5:',  type='build', when='@:18.10.99')
+    depends_on('cmake@3.13:',  type='build', when='@18.11:')
     conflicts('%clang')
 
     def cmake_is_on(self, option):
