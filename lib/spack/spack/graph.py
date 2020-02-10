@@ -515,23 +515,34 @@ def graph_dot(specs, deptype='all', static=False, out=None):
             edges.update((name, d) for d in deps)
         return nodes, edges
 
-    def dynamic_graph(spec, deptypes):
+    def dynamic_graph(spec, deps, deptypes):
         nodes = set()  # elements are (node key, node label)
         edges = set()  # elements are (src key, dest key)
         for s in spec.traverse(deptype=deptype):
-            nodes.add((s.dag_hash(), s.name))
+            if deps is None or s.name in deps:
+                nodes.add((s.dag_hash(), s.name))
             for d in s.dependencies(deptype=deptype):
-                edge = (s.dag_hash(), d.dag_hash())
-                edges.add(edge)
+                if deps is None or d.name in deps:
+                    edges.add((s.dag_hash(), d.dag_hash()))
+                    if deps and s.name not in deps:
+                        nodes.add((s.dag_hash(), s.name))
+                for dd in d.dependencies(deptype=deptype):
+                    if dd.name in deps:
+                        edges.add((s.dag_hash(), d.dag_hash()))
         return nodes, edges
 
     nodes = set()
     edges = set()
+    names = set()
+    depen = set()
     for spec in specs:
+        names.add(spec.format('{name}'))
+        depen |= get_dependencies(spec, deptype)
         if static:
             n, e = static_graph(spec, deptype)
         else:
-            n, e = dynamic_graph(spec, deptype)
+            # n, e = dynamic_graph(spec, None, deptype) # full graph
+            n, e = dynamic_graph(spec, depen | names, deptype) # just xsdk
         nodes.update(n)
         edges.update(e)
 
@@ -548,15 +559,42 @@ def graph_dot(specs, deptype='all', static=False, out=None):
     out.write('     fontsize=24,\n')
     out.write('     margin=.2,\n')
     out.write('     shape=box,\n')
-    out.write('     fillcolor=lightblue,\n')
+    out.write('     fillcolor=brown,\n')
+    out.write('     fontcolor=white,\n')
     out.write('     style="rounded,filled"')
     out.write('  ]\n')
 
     out.write('\n')
     for key, label in nodes:
-        out.write('  "%s" [label="%s"]\n' % (key, label))
+        if label in names:
+            out.write('  "%s" [label="%s"]\n' % (key, label))
+        elif label in depen:
+            out.write('  "%s" [fillcolor=chartreuse4, label="%s"]\n' % (key, label))
+        else:
+            out.write('  "%s" [fillcolor=gray23, label="%s"]\n' % (key, label))
 
     out.write('\n')
     for src, dest in edges:
         out.write('  "%s" -> "%s"\n' % (src, dest))
     out.write('}\n')
+
+
+def get_dependencies(spec, deptype):
+    if not spec.virtual:
+        packages = [spec.package]
+    else:
+        packages = [
+            spack.repo.get(s.name)
+            for s in spack.repo.path.providers_for(spec)]
+
+    dependencies = set()
+    for pkg in packages:
+        possible = pkg.possible_dependencies(
+            False, False, deptype=deptype)
+        dependencies.update(possible)
+
+    if spec.name in dependencies:
+        dependencies.remove(spec.name)
+
+    return dependencies
+

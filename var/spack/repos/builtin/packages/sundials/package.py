@@ -131,6 +131,9 @@ class Sundials(CMakePackage):
     conflicts('+superlu-dist',  when='@:4.1.0')
     conflicts('+f2003',         when='@:4.1.0')
 
+    # Fortran 2003 incompatible with 32-bit indices
+    conflicts('+f2003',         when='~int64')
+
     # External libraries incompatible with 64-bit indices
     conflicts('+lapack', when='@3.0.0: +int64')
     conflicts('+hypre',  when='+hypre@:2.6.1a +int64')
