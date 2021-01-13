@@ -8,7 +8,7 @@ import os
 import sys
 
 
-class Sundials(CMakePackage):
+class Sundials(CMakePackage, CudaPackage, ROCmPackage):
     """SUNDIALS (SUite of Nonlinear and DIfferential/ALgebraic equation
     Solvers)"""
 
@@ -72,8 +72,6 @@ class Sundials(CMakePackage):
             description='Enable OpenMP parallel vector')
     variant('pthread', default=False,
             description='Enable Pthreads parallel vector')
-    variant('cuda',    default=False,
-            description='Enable CUDA vector and solvers')
     variant('raja',    default=False,
             description='Enable RAJA vector')
 
@@ -129,11 +127,8 @@ class Sundials(CMakePackage):
     # Conflicts
     # ==========================================================================
 
-    # Options added after v2.6.2
-    conflicts('+hypre', when='@:2.6.2')
-    conflicts('+petsc', when='@:2.6.2')
-
-    # Options added after v2.7.0
+    conflicts('+hypre',         when='@:2.6.2')
+    conflicts('+petsc',         when='@:2.6.2')
     conflicts('+cuda',          when='@:2.7.0')
     conflicts('+raja',          when='@:2.7.0')
     conflicts('~int64',         when='@:2.7.0')
@@ -141,6 +136,7 @@ class Sundials(CMakePackage):
     conflicts('+superlu-dist',  when='@:4.1.0')
     conflicts('+f2003',         when='@:4.1.0')
     conflicts('+trilinos',      when='@:4.1.0')
+    conflicts('+rocm',          when='@:5.6.0')
 
     # External libraries incompatible with 64-bit indices
     conflicts('+lapack', when='@3.0.0: +int64')
@@ -166,7 +162,7 @@ class Sundials(CMakePackage):
     # ==========================================================================
 
     # Build dependencies
-    depends_on('cmake@3.5:', type='build')
+    depends_on('cmake@3.12:', type='build')
 
     # MPI related dependencies
     depends_on('mpi', when='+mpi')
@@ -175,14 +171,13 @@ class Sundials(CMakePackage):
     depends_on('mpi', when='+superlu-dist')
 
     # Other parallelism dependencies
-    depends_on('cuda', when='+cuda')
-    depends_on('raja +cuda ~openmp', when='+raja')
+    depends_on('raja', when='+raja')
 
     # External libraries
     depends_on('lapack',              when='+lapack')
     depends_on('suite-sparse',        when='+klu')
-    depends_on('petsc +mpi',          when='+petsc')
-    depends_on('hypre +mpi',          when='+hypre')
+    depends_on('petsc+mpi',           when='+petsc')
+    depends_on('hypre+mpi',           when='+hypre')
     depends_on('superlu-dist@6.1.1:', when='@:5.4.0 +superlu-dist')
     depends_on('superlu-dist@6.3.0:', when='@5.5.0: +superlu-dist')
     depends_on('trilinos+tpetra',     when='+trilinos')
@@ -269,8 +264,19 @@ class Sundials(CMakePackage):
             '-DMPI_ENABLE=%s'     % on_off('+mpi'),
             '-DOPENMP_ENABLE=%s'  % on_off('+openmp'),
             '-DPTHREAD_ENABLE=%s' % on_off('+pthread'),
-            '-DCUDA_ENABLE=%s'    % on_off('+cuda')
+            '-DCUDA_ENABLE=%s'    % on_off('+cuda'),
+            '-DENABLE_HIP=%s'     % on_off('+rocm')
         ])
+
+        if '+cuda' in spec:
+            cuda_arch = spec.variants['cuda_arch'].value
+            if cuda_arch != None:
+                args.extend(['CMAKE_CUDA_ARCHITECTURES=%s' % cuda_arch])
+
+        if '+rocm' in spec:
+            amdgpu_targets = spec.variants['amdgpu_targets'].value
+            if amdgpu_targets != None:
+                args.extend(['AMDGPU_TARGETS=%s' % amdgpu_targets])
 
         # MPI support
         if '+mpi' in spec:
