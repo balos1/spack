@@ -263,20 +263,32 @@ class Sundials(CMakePackage, CudaPackage, ROCmPackage):
         args.extend([
             '-DMPI_ENABLE=%s'     % on_off('+mpi'),
             '-DOPENMP_ENABLE=%s'  % on_off('+openmp'),
-            '-DPTHREAD_ENABLE=%s' % on_off('+pthread'),
-            '-DCUDA_ENABLE=%s'    % on_off('+cuda'),
-            '-DENABLE_HIP=%s'     % on_off('+rocm')
+            '-DPTHREAD_ENABLE=%s' % on_off('+pthread')
         ])
 
         if '+cuda' in spec:
-            cuda_arch = spec.variants['cuda_arch'].value
-            if cuda_arch != None:
-                args.extend(['CMAKE_CUDA_ARCHITECTURES=%s' % cuda_arch])
+            args.append('-DCUDA_ENABLE=ON')
+            archs = spec.variants['cuda_arch'].value
+            if archs != 'none':
+                arch_str = ",".join(archs)
+            args.append('CMAKE_CUDA_ARCHITECTURES=%s' % arch_str)
+        else:
+            args.append('-DCUDA_ENABLE=OFF')
 
         if '+rocm' in spec:
-            amdgpu_targets = spec.variants['amdgpu_targets'].value
-            if amdgpu_targets != None:
-                args.extend(['AMDGPU_TARGETS=%s' % amdgpu_targets])
+            rocm_path = spec['llvm-amdgpu'].prefix
+            args.extend([
+                '-DENABLE_HIP=ON',
+                '-DHIP_PATH=%s' % spec['hip'].prefix,
+                # '-DHIP_CLANG_INCLUDE_PATH=%s' % (rocm_path + '/lib/clang/11.0.0/include'),
+                '-DROCM_PATH=%s' % spec['llvm-amdgpu'].prefix
+            ])
+            archs = spec.variants['amdgpu_target'].value
+            if archs != 'none':
+                arch_str = ",".join(archs)
+            args.append('-DAMDGPU_TARGETS=%s' % arch_str)
+        else:
+            args.append('-DENABLE_HIP=OFF')
 
         # MPI support
         if '+mpi' in spec:
