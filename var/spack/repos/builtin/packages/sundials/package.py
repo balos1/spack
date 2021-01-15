@@ -104,18 +104,8 @@ class Sundials(CMakePackage, CudaPackage, ROCmPackage):
             description='Enable Fortran 2003 interface')
 
     # Examples
-    variant('examples-c',       default=True,
-            description='Enable C examples')
-    variant('examples-cxx',     default=False,
-            description='Enable C++ examples')
-    variant('examples-f77',     default=True,
-            description='Enable Fortran 77 examples')
-    variant('examples-f90',     default=False,
-            description='Enable Fortran 90 examples')
-    variant('examples-f2003',   default=False,
-            description='Enable Fortran 2003 examples')
-    variant('examples-cuda',    default=False,
-            description='Enable CUDA examples')
+    variant('examples',         default=True,
+            description='Enable examples')
     variant('examples-install', default=True,
             description='Install examples')
 
@@ -132,7 +122,6 @@ class Sundials(CMakePackage, CudaPackage, ROCmPackage):
     conflicts('+cuda',          when='@:2.7.0')
     conflicts('+raja',          when='@:2.7.0')
     conflicts('~int64',         when='@:2.7.0')
-    conflicts('+examples-cuda', when='@:2.7.0')
     conflicts('+superlu-dist',  when='@:4.1.0')
     conflicts('+f2003',         when='@:4.1.0')
     conflicts('+trilinos',      when='@:4.1.0')
@@ -292,13 +281,12 @@ class Sundials(CMakePackage, CudaPackage, ROCmPackage):
 
         # MPI support
         if '+mpi' in spec:
-            args.extend(['-DMPI_MPICC=%s' % spec['mpi'].mpicc])
-            if 'examples-cxx' in spec:
-                args.extend(['-DMPI_MPICXX=%s' % spec['mpi'].mpicxx])
-            if ('+fcmix' in spec) and ('+examples-f77' in spec):
-                args.extend(['-DMPI_MPIF77=%s' % spec['mpi'].mpif77])
-            if ('+fcmix' in spec) and ('+examples-f90' in spec):
-                args.extend(['-DMPI_MPIF90=%s' % spec['mpi'].mpifc])
+            args.extend([
+                '-DMPI_MPICC=%s' % spec['mpi'].mpicc,
+                '-DMPI_MPICXX=%s' % spec['mpi'].mpicxx,
+                '-DMPI_MPIF77=%s' % spec['mpi'].mpif77,
+                '-DMPI_MPIF90=%s' % spec['mpi'].mpifc
+            ])
 
         # Building with Hypre
         if '+hypre' in spec:
@@ -421,20 +409,18 @@ class Sundials(CMakePackage, CudaPackage, ROCmPackage):
         # Examples
         if spec.satisfies('@3.0.0:'):
             args.extend([
-                '-DEXAMPLES_ENABLE_C=%s'      % on_off('+examples-c'),
-                '-DEXAMPLES_ENABLE_CXX=%s'    % on_off('+examples-cxx'),
-                '-DEXAMPLES_ENABLE_F77=%s'    % on_off('+examples-f77'),
-                '-DEXAMPLES_ENABLE_F90=%s'    % on_off('+examples-f90'),
-                '-DEXAMPLES_ENABLE_F2003=%s'  % on_off('+examples-f2003'),
-                '-DEXAMPLES_ENABLE_CUDA=%s'   % on_off('+examples-cuda'),
-                # option removed in 5.0.0
-                '-DEXAMPLES_ENABLE_RAJA=%s'   % on_off('+raja')
+                '-DEXAMPLES_ENABLE_C=%s'      % on_off('+examples'),
+                '-DEXAMPLES_ENABLE_CXX=%s'    % on_off('+examples'),
+                '-DEXAMPLES_ENABLE_CUDA=%s'   % on_off('+examples+cuda'),
+                '-DEXAMPLES_ENABLE_F77=%s'    % on_off('+examples+fcmix'),
+                '-DEXAMPLES_ENABLE_F90=%s'    % on_off('+examples+fcmix'),
+                '-DEXAMPLES_ENABLE_F2003=%s'  % on_off('+examples+f2003'),
             ])
         else:
             args.extend([
-                '-DEXAMPLES_ENABLE=%s' % on_off('+examples-c'),
-                '-DCXX_ENABLE=%s'      % on_off('+examples-cxx'),
-                '-DF90_ENABLE=%s'      % on_off('+examples-f90')
+                '-DEXAMPLES_ENABLE=%s' % on_off('+examples'),
+                '-DCXX_ENABLE=%s'      % on_off('+examples'),
+                '-DF90_ENABLE=%s'      % on_off('+examples+fcmix')
             ])
 
         args.extend([
@@ -578,17 +564,17 @@ class Sundials(CMakePackage, CudaPackage, ROCmPackage):
             filter_file(r'^CPP\s*=.*', self.compiler.cc,
                         os.path.join(dirname, filename), **kwargs)
 
-        if ('+fcmix' in spec) and ('+examples-f77' in spec):
+        if ('+fcmix' in spec) and ('+examples' in spec):
             for filename in f77_files:
                 filter_file(os.environ['F77'], self.compiler.f77,
                             os.path.join(dirname, filename), **kwargs)
 
-        if ('+fcmix' in spec) and ('+examples-f90' in spec):
+        if ('+fcmix' in spec) and ('+examples' in spec):
             for filename in f90_files:
                 filter_file(os.environ['FC'], self.compiler.fc,
                             os.path.join(dirname, filename), **kwargs)
 
-        if ('+f2003' in spec) and ('+examples-f2003' in spec):
+        if ('+f2003' in spec) and ('+examples' in spec):
             for filename in f2003_files:
                 filter_file(os.environ['FC'], self.compiler.fc,
                             os.path.join(dirname, filename), **kwargs)
@@ -623,3 +609,50 @@ class Sundials(CMakePackage, CudaPackage, ROCmPackage):
                               recursive=True)
 
         return libs or None  # Raise an error if no libs are found
+
+    @run_after('install')
+    @on_package_attributes(run_tests=True)
+    def test_install(self):
+        """Perform make test_install.
+        """
+        with working_dir(self.build_directory):
+            make("test_install")
+
+    @run_after('install')
+    def setup_build_tests(self):
+        """Copy the build test files after the package is installed to a
+        relative install test subdirectory for use during `spack test run`."""
+        # Now copy the relative files
+        self.cache_extra_test_sources(self.build_relpath)
+
+        # Ensure the path exists since relying on a relative path at the
+        # same level as the normal stage source path.
+        mkdirp(self.install_test_root)
+
+    @property
+    def build_relpath(self):
+        """Relative path to the cmake build subdirectory."""
+        return join_path('..', self.build_dirname)
+
+    @property
+    def _extra_tests_path(self):
+        return join_path(self.install_test_root, self.build_relpath)
+
+    def test(self):
+        """Run the smoke tests."""
+        self.run_test('examples/nvector/serial/test_nvector_serial',
+                      options=['10', '0'],
+                      work_dir=self._extra_tests_path)
+        if '+cuda' in self.spec:
+            self.run_test('examples/cvode/cuda/cvAdvDiff_diag_cuda',
+                          work_dir=self._extra_tests_path)
+            self.run_test('examples/nvector/cuda/test_nvector_cuda',
+                          options=['10', '-1', '0'],
+                          work_dir=self._extra_tests_path)
+        if '+rocm' in self.spec:
+            self.run_test('examples/cvode/hip/cvAdvDiff_diag_hip',
+                          work_dir=self._extra_tests_path)
+            self.run_test('examples/nvector/hip/test_nvector_hip',
+                          options=['10', '-1', '0'],
+                          work_dir=self._extra_tests_path)
+        return
