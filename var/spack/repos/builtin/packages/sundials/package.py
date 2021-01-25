@@ -269,7 +269,7 @@ class Sundials(CMakePackage, CudaPackage, ROCmPackage):
             args.extend([
                 '-DENABLE_HIP=ON',
                 '-DHIP_PATH=%s' % spec['hip'].prefix,
-                # '-DHIP_CLANG_INCLUDE_PATH=%s' % (rocm_path + '/lib/clang/11.0.0/include'),
+                '-DHIP_CLANG_INCLUDE_PATH=%s/include' % spec['llvm-amdgpu'].prefix,
                 '-DROCM_PATH=%s' % spec['llvm-amdgpu'].prefix
             ])
             archs = spec.variants['amdgpu_target'].value
