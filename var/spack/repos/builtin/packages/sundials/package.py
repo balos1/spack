@@ -644,13 +644,13 @@ class Sundials(CMakePackage, CudaPackage, ROCmPackage):
                       options=['10', '0'],
                       work_dir=self._extra_tests_path)
         if '+cuda' in self.spec:
-            self.run_test('examples/cvode/cuda/cvAdvDiff_diag_cuda',
+            self.run_test('examples/cvode/cuda/cvAdvDiff_ky_cuda',
                           work_dir=self._extra_tests_path)
             self.run_test('examples/nvector/cuda/test_nvector_cuda',
                           options=['10', '-1', '0'],
                           work_dir=self._extra_tests_path)
         if '+rocm' in self.spec:
-            self.run_test('examples/cvode/hip/cvAdvDiff_diag_hip',
+            self.run_test('examples/cvode/hip/cvAdvDiff_kry_hip',
                           work_dir=self._extra_tests_path)
             self.run_test('examples/nvector/hip/test_nvector_hip',
                           options=['10', '-1', '0'],
