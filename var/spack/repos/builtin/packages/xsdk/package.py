@@ -260,7 +260,7 @@ class Xsdk(BundlePackage, CudaPackage, ROCmPackage):
 
     xsdk_depends_on("sundials +trilinos", when="+trilinos @0.6.0:")
     xsdk_depends_on(
-        "sundials@develop~int64+hypre+petsc+superlu-dist",
+        "sundials@develop~int64+hypre+petsc+superlu-dist+magma",
         when="@develop",
         cuda_var="cuda",
         rocm_var="rocm",
