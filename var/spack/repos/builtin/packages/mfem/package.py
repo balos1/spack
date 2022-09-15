@@ -48,6 +48,8 @@ class Mfem(Package, CudaPackage, ROCmPackage):
     # other version.
     version("develop", branch="master")
 
+    version("4.5.0", branch="master")
+
     version(
         "4.4.0",
         sha256="37250dbef6e97b16dc9ab50973e8d68bc165bb4afcdaf91b3b72c8972c87deef",

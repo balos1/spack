@@ -86,6 +86,7 @@ class Xsdk(BundlePackage, CudaPackage, ROCmPackage):
 
     version("develop")
     version("0.7.0")
+    version("0.8.0")
     version("0.6.0")
     version("0.5.0", deprecated=True)
     version("0.4.0", deprecated=True)
@@ -109,6 +110,7 @@ class Xsdk(BundlePackage, CudaPackage, ROCmPackage):
     variant("arborx", default=True, description="Enable ArborX build")
 
     xsdk_depends_on("hypre@develop+superlu-dist+shared", when="@develop", cuda_var="cuda")
+    xsdk_depends_on("hypre@2.26.0+superlu-dist+shared", when="@0.8.0", cuda_var="cuda")
     xsdk_depends_on("hypre@2.23.0+superlu-dist+shared", when="@0.7.0", cuda_var="cuda")
     xsdk_depends_on("hypre@2.20.0+superlu-dist+shared", when="@0.6.0")
     xsdk_depends_on("hypre@2.18.2+superlu-dist+shared", when="@0.5.0")
@@ -118,6 +120,12 @@ class Xsdk(BundlePackage, CudaPackage, ROCmPackage):
     xsdk_depends_on(
         "mfem@develop+mpi+superlu-dist+petsc~sundials+examples+miniapps",
         when="@develop",
+        cuda_var="cuda",
+        rocm_var="rocm",
+    )
+    xsdk_depends_on(
+        "mfem@4.5.0+mpi+superlu-dist+petsc~sundials+examples+miniapps",
+        when="@0.8.0",
         cuda_var="cuda",
         rocm_var="rocm",
     )
@@ -150,6 +158,13 @@ class Xsdk(BundlePackage, CudaPackage, ROCmPackage):
         + "~exodus~dtk+intrepid2+shards+stratimikos gotype=int"
         + " cxxstd=14",
         when="@develop +trilinos",
+    )
+    xsdk_depends_on(
+        "trilinos@14.0.0+hypre+superlu-dist+hdf5~mumps+boost"
+        + "~suite-sparse+tpetra+nox+ifpack2+zoltan+zoltan2+amesos2"
+        + "~exodus~dtk+intrepid2+shards+stratimikos gotype=int"
+        + " cxxstd=14",
+        when="@0.8.0 +trilinos",
     )
     xsdk_depends_on(
         "trilinos@13.2.0+hypre+superlu-dist+hdf5~mumps+boost"
@@ -185,6 +200,7 @@ class Xsdk(BundlePackage, CudaPackage, ROCmPackage):
     )
 
     xsdk_depends_on("datatransferkit@master", when="@develop +trilinos +datatransferkit")
+    xsdk_depends_on("datatransferkit@3.1-rc3", when="@0.8.0 +trilinos +datatransferkit")
     dtk7ver = "3.1-rc2" if sys.platform == "darwin" else "3.1-rc3"
     xsdk_depends_on("datatransferkit@" + dtk7ver, when="@0.7.0 +trilinos +datatransferkit")
     xsdk_depends_on("datatransferkit@3.1-rc2", when="@0.6.0 +trilinos +datatransferkit")
@@ -194,6 +210,11 @@ class Xsdk(BundlePackage, CudaPackage, ROCmPackage):
     xsdk_depends_on(
         "petsc@main+mpi+hypre+superlu-dist+metis+hdf5~mumps+double~int64",
         when="@develop",
+        cuda_var="cuda",
+    )
+    xsdk_depends_on(
+        "petsc@3.18.0+mpi+hypre+superlu-dist+metis+hdf5~mumps+double~int64",
+        when="@0.8.0",
         cuda_var="cuda",
     )
     xsdk_depends_on(
@@ -224,6 +245,11 @@ class Xsdk(BundlePackage, CudaPackage, ROCmPackage):
         when="@develop +dealii",
     )
     xsdk_depends_on(
+        "dealii@9.4.0~assimp~python~doc~gmsh+petsc+slepc+mpi~int64+hdf5"
+        + "~netcdf+metis~sundials~ginkgo~symengine~simplex~arborx",
+        when="@0.8.0 +dealii",
+    )
+    xsdk_depends_on(
         "dealii@9.3.2~assimp~python~doc~gmsh+petsc+slepc+mpi~int64+hdf5"
         + "~netcdf+metis~sundials~ginkgo~symengine~simplex~arborx",
         when="@0.7.0 +dealii",
@@ -245,6 +271,7 @@ class Xsdk(BundlePackage, CudaPackage, ROCmPackage):
     )
 
     xsdk_depends_on("pflotran@develop", when="@develop")
+    xsdk_depends_on("pflotran@4.0.1", when="@0.8.0")
     xsdk_depends_on("pflotran@3.0.2", when="@0.7.0")
     xsdk_depends_on("pflotran@xsdk-0.6.0", when="@0.6.0")
     xsdk_depends_on("pflotran@xsdk-0.5.0", when="@0.5.0")
@@ -262,6 +289,12 @@ class Xsdk(BundlePackage, CudaPackage, ROCmPackage):
     xsdk_depends_on(
         "sundials@develop~int64+hypre+petsc+superlu-dist+magma",
         when="@develop",
+        cuda_var="cuda",
+        rocm_var="rocm",
+    )
+    xsdk_depends_on(
+        "sundials@6.4.0~int64+hypre+petsc+superlu-dist",
+        when="@0.8.0",
         cuda_var="cuda",
         rocm_var="rocm",
     )
@@ -285,6 +318,7 @@ class Xsdk(BundlePackage, CudaPackage, ROCmPackage):
     xsdk_depends_on("plasma@18.11.1:", when="@0.4.0 %gcc@6.0:")
 
     xsdk_depends_on("magma@master", when="@develop", cuda_var="?cuda", rocm_var="?rocm")
+    xsdk_depends_on("magma@2.6.2", when="@0.8.0", cuda_var="?cuda", rocm_var="?rocm")
     xsdk_depends_on("magma@2.6.1", when="@0.7.0", cuda_var="?cuda", rocm_var="?rocm")
     xsdk_depends_on("magma@2.5.4", when="@0.6.0", cuda_var="?cuda")
     xsdk_depends_on("magma@2.5.1", when="@0.5.0", cuda_var="?cuda")
@@ -311,6 +345,7 @@ class Xsdk(BundlePackage, CudaPackage, ROCmPackage):
     xsdk_depends_on("amrex@18.10.1", when="@0.4.0 %gcc")
 
     xsdk_depends_on("slepc@main", when="@develop")
+    xsdk_depends_on("slepc@3.18.0", when="@0.8.0")
     xsdk_depends_on("slepc@3.16.0", when="@0.7.0")
     xsdk_depends_on("slepc@3.14.0", when="@0.6.0")
     xsdk_depends_on("slepc@3.12.0", when="@0.5.0")
@@ -326,6 +361,7 @@ class Xsdk(BundlePackage, CudaPackage, ROCmPackage):
 
     xsdk_depends_on("strumpack ~cuda", when="~cuda @0.6.0: +strumpack")
     xsdk_depends_on("strumpack@master~slate~openmp", when="@develop +strumpack")
+    xsdk_depends_on("strumpack@7.1.0~slate~openmp", when="@0.8.0 +strumpack")
     xsdk_depends_on("strumpack@6.1.0~slate~openmp", when="@0.7.0 +strumpack")
     xsdk_depends_on("strumpack@5.0.0~slate~openmp", when="@0.6.0 +strumpack")
     xsdk_depends_on("strumpack@3.3.0~slate~openmp", when="@0.5.0 +strumpack")
@@ -364,6 +400,7 @@ class Xsdk(BundlePackage, CudaPackage, ROCmPackage):
     )
 
     xsdk_depends_on("arborx@master", when="@develop +arborx")
+    xsdk_depends_on("arborx@1.2", when="@0.8.0 +arborx")
     xsdk_depends_on("arborx@1.1", when="@0.7.0 +arborx")
 
     # the Fortran 2003 bindings of phist require python@3:, but this
@@ -424,5 +461,6 @@ class Xsdk(BundlePackage, CudaPackage, ROCmPackage):
     xsdk_depends_on("heffte@2.0.0+fftw", when="@0.6.0 +heffte", cuda_var=["cuda", "?magma"])
 
     xsdk_depends_on("slate@master", when="@develop +slate %gcc@6.0:", cuda_var="cuda")
+    xsdk_depends_on("slate@2022.07.00", when="@0.8.0 +slate %gcc@6.0:", cuda_var="cuda")
     xsdk_depends_on("slate@2021.05.02", when="@0.7.0 +slate %gcc@6.0:", cuda_var="cuda")
     xsdk_depends_on("slate@2020.10.00", when="@0.6.0 +slate %gcc@6.0:", cuda_var="cuda")
