@@ -316,6 +316,7 @@ class Xsdk(BundlePackage, CudaPackage, ROCmPackage):
     xsdk_depends_on("sundials@3.1.0~int64+hypre", when="@0.3.0")
 
     xsdk_depends_on("plasma@develop:", when="@develop %gcc@6.0:")
+    xsdk_depends_on("plasma@22.9.29:", when="@0.8.0 %gcc@6.0:")
     xsdk_depends_on("plasma@21.8.29:", when="@0.7.0 %gcc@6.0:")
     xsdk_depends_on("plasma@20.9.20:", when="@0.6.0 %gcc@6.0:")
     xsdk_depends_on("plasma@19.8.1:", when="@0.5.0 %gcc@6.0:")
@@ -434,6 +435,9 @@ class Xsdk(BundlePackage, CudaPackage, ROCmPackage):
 
     xsdk_depends_on(
         "ginkgo@develop ~openmp", when="@develop +ginkgo", cuda_var="cuda", rocm_var="rocm"
+    )
+    xsdk_depends_on(
+        "ginkgo@1.4.0 ~openmp", when="@0.8.0 +ginkgo", cuda_var="cuda", rocm_var="rocm"
     )
     xsdk_depends_on(
         "ginkgo@1.4.0 ~openmp", when="@0.7.0 +ginkgo", cuda_var="cuda", rocm_var="rocm"
