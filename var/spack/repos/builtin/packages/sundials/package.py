@@ -229,7 +229,8 @@ class Sundials(CMakePackage, CudaPackage, ROCmPackage):
     depends_on("petsc+mpi", when="+petsc")
     depends_on("suite-sparse", when="+klu")
     depends_on("superlu-dist@6.1.1:", when="@:5.4.0 +superlu-dist")
-    depends_on("superlu-dist@6.3.0:", when="@5.5.0: +superlu-dist")
+    depends_on("superlu-dist@6.3.0:", when="@5.5.0:6.3 +superlu-dist")
+    depends_on("superlu-dist@7:", when="@6.4: +superlu-dist")
     depends_on("trilinos+tpetra", when="+trilinos")
 
     # Require that external libraries built with the same precision
@@ -439,15 +440,22 @@ class Sundials(CMakePackage, CudaPackage, ROCmPackage):
 
         # Building with SuperLU_DIST
         if "+superlu-dist" in spec:
-            args.extend(
-                [
-                    define("OPENMP_ENABLE", "^superlu-dist+openmp" in spec),
-                    define("SUPERLUDIST_INCLUDE_DIR", spec["superlu-dist"].prefix.include),
-                    define("SUPERLUDIST_LIBRARY_DIR", spec["superlu-dist"].prefix.lib),
-                    define("SUPERLUDIST_LIBRARIES", spec["blas"].libs),
-                    define("SUPERLUDIST_OpenMP", "^superlu-dist+openmp" in spec),
-                ]
-            )
+            if spec.satisfies("@6.4.0:"):
+                args.extend(
+                    [
+                        define("SUPERLUDIST_DIR", spec["superlu-dist"].prefix),
+                        define("SUPERLUDIST_OpenMP", "^superlu-dist+openmp" in spec), 
+                    ]
+                )
+            else:
+                args.extend(
+                    [
+                        define("SUPERLUDIST_INCLUDE_DIR", spec["superlu-dist"].prefix.include),
+                        define("SUPERLUDIST_LIBRARY_DIR", spec["superlu-dist"].prefix.lib),
+                        define("SUPERLUDIST_LIBRARIES", spec["blas"].libs),
+                        define("SUPERLUDIST_OpenMP", "^superlu-dist+openmp" in spec),
+                    ]
+                )
 
         # Building with Trilinos
         if "+trilinos" in spec:
