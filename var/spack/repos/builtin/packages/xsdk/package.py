@@ -282,6 +282,7 @@ class Xsdk(BundlePackage, CudaPackage, ROCmPackage):
     xsdk_depends_on("pflotran@xsdk-0.3.0", when="@0.3.0")
 
     xsdk_depends_on("alquimia@develop", when="@develop +alquimia")
+    xsdk_depends_on("alquimia@1.0.9", when="@0.8.0 +alquimia")
     xsdk_depends_on("alquimia@1.0.9", when="@0.7.0 +alquimia")
     xsdk_depends_on("alquimia@xsdk-0.6.0", when="@0.6.0 +alquimia")
     xsdk_depends_on("alquimia@xsdk-0.5.0", when="@0.5.0 +alquimia ")
@@ -453,6 +454,7 @@ class Xsdk(BundlePackage, CudaPackage, ROCmPackage):
 
     xsdk_depends_on("precice ~petsc", when="platform=cray +precice")
     xsdk_depends_on("precice@develop", when="@develop +precice")
+    xsdk_depends_on("precice@2.5.0", when="@0.8.0 +precice")
     xsdk_depends_on("precice@2.3.0", when="@0.7.0 +precice")
     xsdk_depends_on("precice@2.1.1", when="@0.6.0 +precice")
     xsdk_depends_on("precice@1.6.1", when="@0.5.0 +precice")
