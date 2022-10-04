@@ -108,6 +108,8 @@ class Xsdk(BundlePackage, CudaPackage, ROCmPackage):
     variant("heffte", default=True, description="Enable heffte package build")
     variant("slate", default=True, description="Enable slate package build")
     variant("arborx", default=True, description="Enable ArborX build")
+    variant("exago", default=True, description="Enable exago build")
+    variant("hiop", default=True, description="Enable hiop build")
 
     xsdk_depends_on("hypre@develop+superlu-dist+shared", when="@develop", cuda_var="cuda")
     xsdk_depends_on("hypre@2.26.0+superlu-dist+shared", when="@0.8.0", cuda_var="cuda")
@@ -147,6 +149,7 @@ class Xsdk(BundlePackage, CudaPackage, ROCmPackage):
     xsdk_depends_on("mfem@3.3.2+mpi+superlu-dist+petsc+sundials+examples+miniapps", when="@0.3.0")
 
     xsdk_depends_on("superlu-dist@develop", when="@develop")
+    xsdk_depends_on("superlu-dist@8.1.1", when="@0.8.0")
     xsdk_depends_on("superlu-dist@7.1.1", when="@0.7.0")
     xsdk_depends_on("superlu-dist@6.4.0", when="@0.6.0")
     xsdk_depends_on("superlu-dist@6.1.1", when="@0.5.0")
@@ -334,6 +337,9 @@ class Xsdk(BundlePackage, CudaPackage, ROCmPackage):
     xsdk_depends_on(
         "amrex@develop+sundials", when="@develop %cce", cuda_var="cuda", rocm_var="rocm"
     )
+    xsdk_depends_on("amrex@22.09+sundials", when="@0.8.0 %intel", cuda_var="cuda", rocm_var="rocm")
+    xsdk_depends_on("amrex@22.09+sundials", when="@0.8.0 %gcc", cuda_var="cuda", rocm_var="rocm")
+    xsdk_depends_on("amrex@22.09+sundials", when="@0.8.0 %cce", cuda_var="cuda", rocm_var="rocm")
     xsdk_depends_on("amrex@21.10+sundials", when="@0.7.0 %intel", cuda_var="cuda", rocm_var="rocm")
     xsdk_depends_on("amrex@21.10+sundials", when="@0.7.0 %gcc", cuda_var="cuda", rocm_var="rocm")
     xsdk_depends_on("amrex@21.10+sundials", when="@0.7.0 %cce", cuda_var="cuda", rocm_var="rocm")
@@ -354,6 +360,7 @@ class Xsdk(BundlePackage, CudaPackage, ROCmPackage):
     xsdk_depends_on("omega-h +trilinos", when="+trilinos +omega-h")
     xsdk_depends_on("omega-h ~trilinos", when="~trilinos +omega-h")
     xsdk_depends_on("omega-h@main", when="@develop +omega-h")
+    xsdk_depends_on("omega-h@9.34.13", when="@0.8.0 +omega-h")
     xsdk_depends_on("omega-h@9.34.1", when="@0.7.0 +omega-h")
     xsdk_depends_on("omega-h@9.32.5", when="@0.6.0 +omega-h")
     xsdk_depends_on("omega-h@9.29.0", when="@0.5.0 +omega-h")
@@ -368,6 +375,7 @@ class Xsdk(BundlePackage, CudaPackage, ROCmPackage):
     xsdk_depends_on("strumpack@3.1.1~slate~openmp", when="@0.4.0 +strumpack")
 
     xsdk_depends_on("pumi@master", when="@develop")
+    xsdk_depends_on("pumi@2.2.7", when="@0.8.0")
     xsdk_depends_on("pumi@2.2.6", when="@0.7.0")
     xsdk_depends_on("pumi@2.2.5", when="@0.6.0")
     xsdk_depends_on("pumi@2.2.1", when="@0.5.0")
@@ -379,6 +387,11 @@ class Xsdk(BundlePackage, CudaPackage, ROCmPackage):
         when="@develop",
         cuda_var=["cuda", "?magma"],
         rocm_var=["rocm", "?magma"],
+    )
+    xsdk_depends_on(
+        "tasmanian@7.9+xsdkflags+mpi+blas" + tasmanian_openmp,
+        when="@0.8.0",
+        cuda_var=["cuda", "?magma"],
     )
     xsdk_depends_on(
         "tasmanian@7.7+xsdkflags+mpi+blas" + tasmanian_openmp,
@@ -412,6 +425,7 @@ class Xsdk(BundlePackage, CudaPackage, ROCmPackage):
     xsdk_depends_on("phist kernel_lib=tpetra", when="+trilinos +phist")
     xsdk_depends_on("phist kernel_lib=petsc", when="~trilinos +phist")
     xsdk_depends_on("phist@develop ~fortran ~scamac ~openmp ~host ~int64", when="@develop +phist")
+    xsdk_depends_on("phist@1.10.0 ~fortran ~scamac ~openmp ~host ~int64", when="@0.8.0 +phist")
     xsdk_depends_on("phist@1.9.5 ~fortran ~scamac ~openmp ~host ~int64", when="@0.7.0 +phist")
     xsdk_depends_on("phist@1.9.3 ~fortran ~scamac ~openmp ~host ~int64", when="@0.6.0 +phist")
     xsdk_depends_on("phist@1.8.0 ~fortran ~scamac ~openmp ~host ~int64", when="@0.5.0 +phist")
@@ -428,6 +442,8 @@ class Xsdk(BundlePackage, CudaPackage, ROCmPackage):
 
     xsdk_depends_on("py-libensemble@develop+petsc4py", when="@develop +libensemble")
     xsdk_depends_on("py-petsc4py@main", when="@develop +libensemble")
+    xsdk_depends_on("py-libensemble@0.9.3+petsc4py", when="@0.8.0 +libensemble")
+    xsdk_depends_on("py-petsc4py@3.18.0", when="@0.8.0 +libensemble")
     xsdk_depends_on("py-libensemble@0.8.0+petsc4py", when="@0.7.0 +libensemble")
     xsdk_depends_on("py-petsc4py@3.16.1", when="@0.7.0 +libensemble")
     xsdk_depends_on("py-libensemble@0.7.1+petsc4py", when="@0.6.0 +libensemble")
@@ -442,6 +458,7 @@ class Xsdk(BundlePackage, CudaPackage, ROCmPackage):
     xsdk_depends_on("precice@1.6.1", when="@0.5.0 +precice")
 
     xsdk_depends_on("butterflypack@master", when="@develop +butterflypack")
+    xsdk_depends_on("butterflypack@2.2.0", when="@0.8.0 +butterflypack")
     xsdk_depends_on("butterflypack@2.0.0", when="@0.7.0 +butterflypack")
     xsdk_depends_on("butterflypack@1.2.1", when="@0.6.0 +butterflypack")
     xsdk_depends_on("butterflypack@1.1.0", when="@0.5.0 +butterflypack")
@@ -449,6 +466,12 @@ class Xsdk(BundlePackage, CudaPackage, ROCmPackage):
     xsdk_depends_on(
         "heffte@develop+fftw",
         when="@develop +heffte",
+        cuda_var=["cuda", "?magma"],
+        rocm_var=["rocm", "?magma"],
+    )
+    xsdk_depends_on(
+        "heffte@2.3.0+fftw",
+        when="@0.8.0 +heffte",
         cuda_var=["cuda", "?magma"],
         rocm_var=["rocm", "?magma"],
     )
@@ -464,3 +487,9 @@ class Xsdk(BundlePackage, CudaPackage, ROCmPackage):
     xsdk_depends_on("slate@2022.07.00", when="@0.8.0 +slate %gcc@6.0:", cuda_var="cuda")
     xsdk_depends_on("slate@2021.05.02", when="@0.7.0 +slate %gcc@6.0:", cuda_var="cuda")
     xsdk_depends_on("slate@2020.10.00", when="@0.6.0 +slate %gcc@6.0:", cuda_var="cuda")
+
+    xsdk_depends_on("exago@develop", when="@develop +exago")
+    xsdk_depends_on("exago@1.4.1", when="@0.8.0 +exago")
+
+    xsdk_depends_on("hiop@develop", when="@develop +hiop")
+    xsdk_depends_on("hiop@0.6.2", when="@0.8.0 +hiop")
