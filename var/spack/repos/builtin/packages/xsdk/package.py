@@ -163,7 +163,7 @@ class Xsdk(BundlePackage, CudaPackage, ROCmPackage):
         when="@develop +trilinos",
     )
     xsdk_depends_on(
-        "trilinos@14.0.0+hypre+superlu-dist+hdf5~mumps+boost"
+        "trilinos@13.4.0+hypre+superlu-dist+hdf5~mumps+boost"
         + "~suite-sparse+tpetra+nox+ifpack2+zoltan+zoltan2+amesos2"
         + "~exodus~dtk+intrepid2+shards+stratimikos gotype=int"
         + " cxxstd=14",
