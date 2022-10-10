@@ -149,7 +149,7 @@ class Xsdk(BundlePackage, CudaPackage, ROCmPackage):
     xsdk_depends_on("mfem@3.3.2+mpi+superlu-dist+petsc+sundials+examples+miniapps", when="@0.3.0")
 
     xsdk_depends_on("superlu-dist@develop", when="@develop")
-    xsdk_depends_on("superlu-dist@8.1.1", when="@0.8.0")
+    xsdk_depends_on("superlu-dist@8.1.2", when="@0.8.0")
     xsdk_depends_on("superlu-dist@7.1.1", when="@0.7.0")
     xsdk_depends_on("superlu-dist@6.4.0", when="@0.6.0")
     xsdk_depends_on("superlu-dist@6.1.1", when="@0.5.0")
