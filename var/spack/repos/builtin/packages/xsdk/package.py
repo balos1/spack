@@ -437,7 +437,7 @@ class Xsdk(BundlePackage, CudaPackage, ROCmPackage):
         "ginkgo@develop ~openmp", when="@develop +ginkgo", cuda_var="cuda", rocm_var="rocm"
     )
     xsdk_depends_on(
-        "ginkgo@1.4.0 ~openmp", when="@0.8.0 +ginkgo", cuda_var="cuda", rocm_var="rocm"
+        "ginkgo@1.5.0 ~openmp", when="@0.8.0 +ginkgo", cuda_var="cuda", rocm_var="rocm"
     )
     xsdk_depends_on(
         "ginkgo@1.4.0 ~openmp", when="@0.7.0 +ginkgo", cuda_var="cuda", rocm_var="rocm"
