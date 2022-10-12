@@ -421,7 +421,8 @@ class Trilinos(CMakePackage, CudaPackage, ROCmPackage):
     depends_on("superlu-dist@:4.3", when="@11.14.1:12.6.1+superlu-dist")
     depends_on("superlu-dist@4.4:5.3", when="@12.6.2:12.12.1+superlu-dist")
     depends_on("superlu-dist@5.4:6.2.0", when="@12.12.2:13.0.0+superlu-dist")
-    depends_on("superlu-dist@6.3.0:7", when="@13.0.1:13 +superlu-dist")
+    depends_on("superlu-dist@6.3.0:7", when="@13.0.1:13.3 +superlu-dist")
+    depends_on("superlu-dist@8:", when="@13.4:13 +superlu-dist")
     depends_on("superlu-dist@develop", when="@master: +superlu-dist")
 
     # ###################### Patches ##########################
@@ -447,6 +448,11 @@ class Trilinos(CMakePackage, CudaPackage, ROCmPackage):
         "https://github.com/trilinos/Trilinos/commit/b17f20a0b91e0b9fc5b1b0af3c8a34e2a4874f3f.patch?full_index=1",
         sha256="063a38f402439fa39fd8d57315a321e6510adcd04aec5400a88e744aaa60bc8e",
         when="@13.0.0:13.0.1 +teko gotype=long",
+    )
+    patch(
+        "https://patch-diff.githubusercontent.com/raw/trilinos/Trilinos/pull/11134.patch?full_index=1",
+        sha256="ce4fc14f9286799c932bd149f7ea61c672819c85f0385eef9c3d1b2d361bda77",
+        when="@13.4.0 +superlu-dist",
     )
 
     def flag_handler(self, name, flags):
