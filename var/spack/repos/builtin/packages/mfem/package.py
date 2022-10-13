@@ -259,17 +259,13 @@ class Mfem(Package, CudaPackage, ROCmPackage):
     depends_on("sundials@2.7.0:", when="@3.3.2:+sundials~mpi")
     depends_on("sundials@2.7.0:+mpi+hypre", when="@3.3.2:+sundials+mpi")
     depends_on("sundials@5.0.0:5", when="@4.0.1-xsdk:4.4+sundials~mpi")
-    depends_on("sundials@5.0.0:", when="@4.5.0:+sundials~mpi")
     depends_on("sundials@5.0.0:5+mpi+hypre", when="@4.0.1-xsdk:4.4+sundials+mpi")
+    depends_on("sundials@5.0.0:", when="@4.5.0:+sundials~mpi")
     depends_on("sundials@5.0.0:+mpi+hypre", when="@4.5.0:+sundials+mpi")
     for sm_ in CudaPackage.cuda_arch_values:
         depends_on(
-            "sundials@5.4.0:5+cuda cuda_arch={0}".format(sm_),
-            when="@4.2.0:+sundials+cuda cuda_arch={0}".format(sm_),
-        )
-        depends_on(
             "sundials@5.4.0:+cuda cuda_arch={0}".format(sm_),
-            when="@4.5.0:+sundials+cuda cuda_arch={0}".format(sm_),
+            when="@4.2.0:+sundials+cuda cuda_arch={0}".format(sm_),
         )
     depends_on("pumi", when="+pumi~shared")
     depends_on("pumi+shared", when="+pumi+shared")
