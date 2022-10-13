@@ -267,6 +267,10 @@ class Mfem(Package, CudaPackage, ROCmPackage):
             "sundials@5.4.0:5+cuda cuda_arch={0}".format(sm_),
             when="@4.2.0:+sundials+cuda cuda_arch={0}".format(sm_),
         )
+        depends_on(
+            "sundials@5.4.0:+cuda cuda_arch={0}".format(sm_),
+            when="@4.5.0:+sundials+cuda cuda_arch={0}".format(sm_),
+        )
     depends_on("pumi", when="+pumi~shared")
     depends_on("pumi+shared", when="+pumi+shared")
     depends_on("pumi@2.2.3:2.2.5", when="@4.2.0:4.3.0+pumi")

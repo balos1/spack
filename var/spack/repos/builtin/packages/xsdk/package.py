@@ -120,13 +120,13 @@ class Xsdk(BundlePackage, CudaPackage, ROCmPackage):
     xsdk_depends_on("hypre@2.12.1~internal-superlu", when="@0.3.0")
 
     xsdk_depends_on(
-        "mfem@develop+mpi+superlu-dist+petsc~sundials+examples+miniapps",
+        "mfem@develop+mpi+superlu-dist+petsc+sundials+examples+miniapps",
         when="@develop",
         cuda_var="cuda",
         rocm_var="rocm",
     )
     xsdk_depends_on(
-        "mfem@4.5.0+mpi+superlu-dist+petsc~sundials+examples+miniapps",
+        "mfem@4.5.0+mpi+superlu-dist+petsc+sundials+examples+miniapps",
         when="@0.8.0",
         cuda_var="cuda",
         rocm_var="rocm",
