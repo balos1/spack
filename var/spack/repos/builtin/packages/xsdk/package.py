@@ -292,6 +292,7 @@ class Xsdk(BundlePackage, CudaPackage, ROCmPackage):
     xsdk_depends_on("alquimia@xsdk-0.3.0", when="@0.3.0 +alquimia")
 
     xsdk_depends_on("sundials +trilinos", when="+trilinos @0.6.0:")
+    xsdk_depends_on("sundials +ginkgo", when="+ginkgo @0.8.0:")
     xsdk_depends_on(
         "sundials@develop~int64+hypre+petsc+superlu-dist+magma",
         when="@develop",
