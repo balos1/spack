@@ -123,9 +123,10 @@ class Sundials(CMakePackage, CudaPackage, ROCmPackage):
         when="@6.0.0: +profiling",
         description="Enable Caliper instrumentation/profiling",
     )
+    variant("ginkgo", default=False, when="@6.4.0:", description="Enable Ginkgo interfaces")
     variant("hypre", default=False, when="@2.7.0:", description="Enable Hypre MPI parallel vector")
-    variant("lapack", default=False, description="Enable LAPACK direct solvers")
     variant("klu", default=False, description="Enable KLU sparse, direct solver")
+    variant("lapack", default=False, description="Enable LAPACK direct solvers")
     variant("petsc", default=False, when="@2.7.0:", description="Enable PETSc interfaces")
     variant("magma", default=False, when="@5.7.0:", description="Enable MAGMA interface")
     variant("superlu-mt", default=False, description="Enable SuperLU_MT sparse, direct solver")
@@ -206,6 +207,7 @@ class Sundials(CMakePackage, CudaPackage, ROCmPackage):
 
     # Build dependencies
     depends_on("cmake@3.12:", type="build")
+    depends_on("cmake@3.18:", when="+cuda", type="build")
 
     # MPI related dependencies
     depends_on("mpi", when="+mpi")
@@ -220,6 +222,7 @@ class Sundials(CMakePackage, CudaPackage, ROCmPackage):
 
     # External libraries
     depends_on("caliper", when="+caliper")
+    depends_on("ginkgo@1.5.0:", when="+ginkgo")
     depends_on("lapack", when="+lapack")
     depends_on("hypre+mpi~int64", when="@5.7.1: +hypre ~int64")
     depends_on("hypre+mpi+int64", when="@5.7.1: +hypre +int64")
@@ -369,6 +372,25 @@ class Sundials(CMakePackage, CudaPackage, ROCmPackage):
                 ]
             )
 
+        # Building with Ginkgo
+        if "+ginkgo" in spec:
+            gko_backends = ['REF']
+            if "+openmp" in spec["ginkgo"] and "+openmp" in spec:
+                gko_backends.append('OMP')
+            if "+cuda" in spec["ginkgo"] and "+cuda" in spec:
+                gko_backends.append('CUDA')
+            if "+rocm" in spec["ginkgo"] and "+rocm" in spec:
+                gko_backends.append('HIP')
+            if "+oneapi" in spec["ginkgo"] and "+sycl" in spec:
+                gko_backends.append('DPCPP')
+            args.extend(
+                [
+                    from_variant("ENABLE_GINKGO", "ginkgo"),
+                    define("Ginkgo_DIR", spec["ginkgo"].prefix),
+                    define("SUNDIALS_GINKGO_BACKENDS", ';'.join(gko_backends))
+                ]
+            )
+
         # Building with Hypre
         if "+hypre" in spec:
             args.extend(
@@ -444,7 +466,7 @@ class Sundials(CMakePackage, CudaPackage, ROCmPackage):
                 args.extend(
                     [
                         define("SUPERLUDIST_DIR", spec["superlu-dist"].prefix),
-                        define("SUPERLUDIST_OpenMP", "^superlu-dist+openmp" in spec), 
+                        define("SUPERLUDIST_OpenMP", "^superlu-dist+openmp" in spec),
                     ]
                 )
             else:
