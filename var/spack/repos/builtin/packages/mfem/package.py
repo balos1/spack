@@ -539,6 +539,19 @@ class Mfem(Package, CudaPackage, ROCmPackage):
             "MFEM_USE_EXCEPTIONS=%s" % yes_no("+exceptions"),
         ]
 
+        # Determine C++ standard to use:
+        cxxstd = None
+        if self.spec.satisfies("@4.0.0:"):
+            cxxstd = "11"
+        if self.spec.satisfies("^sundials@6.4.0:"):
+            cxxstd = "14"
+        cxxstd_flag = None
+        if cxxstd:
+            if "+cuda" in spec:
+                cxxstd_flag = "-std=c++" + cxxstd
+            else:
+                cxxstd_flag = getattr(self.compiler, "cxx" + cxxstd + "_flag")
+
         cxxflags = spec.compiler_flags["cxxflags"]
 
         if cxxflags:
@@ -561,15 +574,15 @@ class Mfem(Package, CudaPackage, ROCmPackage):
                     "-x=cu --expt-extended-lambda -arch=sm_%s" % cuda_arch,
                     "-ccbin %s" % (spec["mpi"].mpicxx if "+mpi" in spec else env["CXX"]),
                 ]
-            if self.spec.satisfies("@4.0.0:"):
-                if "+cuda" in spec:
-                    cxxflags.append("-std=c++11")
-                else:
-                    cxxflags.append(self.compiler.cxx11_flag)
+            if cxxstd_flag:
+                cxxflags.append(cxxstd_flag)
             # The cxxflags are set by the spack c++ compiler wrapper. We also
             # set CXXFLAGS explicitly, for clarity, and to properly export the
             # cxxflags in the variable MFEM_CXXFLAGS in config.mk.
             options += ["CXXFLAGS=%s" % " ".join(cxxflags)]
+
+        elif cxxstd_flag:
+            options += ["BASE_FLAGS=%s" % cxxstd_flag]
 
         # Treat any 'CXXFLAGS' in the environment as extra c++ flags which are
         # handled through the 'CPPFLAGS' makefile variable in MFEM. Also, unset
