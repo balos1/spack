@@ -203,8 +203,9 @@ class Xsdk(BundlePackage, CudaPackage, ROCmPackage):
     )
 
     xsdk_depends_on("datatransferkit@master", when="@develop +trilinos +datatransferkit")
-    xsdk_depends_on("datatransferkit@3.1-rc3", when="@0.8.0 +trilinos +datatransferkit")
-    dtk7ver = "3.1-rc2" if sys.platform == "darwin" else "3.1-rc3"
+    dtk8ver = "3.1-rc2" if sys.platform == "darwin" else "3.1-rc3"
+    xsdk_depends_on("datatransferkit@" + dtk8ver, when="@0.8.0 +trilinos +datatransferkit")
+    dtk7ver = dtk8ver
     xsdk_depends_on("datatransferkit@" + dtk7ver, when="@0.7.0 +trilinos +datatransferkit")
     xsdk_depends_on("datatransferkit@3.1-rc2", when="@0.6.0 +trilinos +datatransferkit")
 
