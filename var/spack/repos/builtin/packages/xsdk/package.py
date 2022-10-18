@@ -217,7 +217,7 @@ class Xsdk(BundlePackage, CudaPackage, ROCmPackage):
         rocm_var="rocm",
     )
     xsdk_depends_on(
-        "petsc@3.18.0+mpi+hypre+superlu-dist+metis+hdf5~mumps+double~int64+kokkos",
+        "petsc@3.18.1+mpi+hypre+superlu-dist+metis+hdf5~mumps+double~int64+kokkos",
         when="@0.8.0",
         cuda_var="cuda",
         rocm_var="rocm",
