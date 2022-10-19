@@ -106,7 +106,7 @@ class Xsdk(BundlePackage, CudaPackage, ROCmPackage):
     )
     variant("butterflypack", default=True, description="Enable butterflypack package build")
     variant("heffte", default=True, description="Enable heffte package build")
-    variant("slate", default=True, description="Enable slate package build")
+    variant("slate", default=(sys.platform != "darwin"), description="Enable slate package build")
     variant("arborx", default=True, description="Enable ArborX build")
     variant("exago", default=True, description="Enable exago build")
     variant("hiop", default=True, description="Enable hiop build")
@@ -495,8 +495,8 @@ class Xsdk(BundlePackage, CudaPackage, ROCmPackage):
     )
     xsdk_depends_on("heffte@2.0.0+fftw", when="@0.6.0 +heffte", cuda_var=["cuda", "?magma"])
 
-    xsdk_depends_on("slate@master", when="@develop +slate %gcc@6.0:", cuda_var="cuda")
-    xsdk_depends_on("slate@2022.07.00", when="@0.8.0 +slate %gcc@6.0:", cuda_var="cuda")
+    xsdk_depends_on("slate@master", when="@develop +slate", cuda_var="cuda")
+    xsdk_depends_on("slate@2022.07.00", when="@0.8.0 +slate", cuda_var="cuda")
     xsdk_depends_on("slate@2021.05.02", when="@0.7.0 +slate %gcc@6.0:", cuda_var="cuda")
     xsdk_depends_on("slate@2020.10.00", when="@0.6.0 +slate %gcc@6.0:", cuda_var="cuda")
 
