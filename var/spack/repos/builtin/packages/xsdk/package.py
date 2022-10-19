@@ -372,9 +372,10 @@ class Xsdk(BundlePackage, CudaPackage, ROCmPackage):
     xsdk_depends_on("omega-h@9.29.0", when="@0.5.0 +omega-h")
     xsdk_depends_on("omega-h@9.19.1", when="@0.4.0 +omega-h")
 
+    strumpack_openmp = "~slate~openmp" if sys.platform == "darwin" else ""
     xsdk_depends_on("strumpack ~cuda", when="~cuda @0.6.0: +strumpack")
-    xsdk_depends_on("strumpack@master", when="@develop +strumpack", cuda_var=["cuda"])
-    xsdk_depends_on("strumpack@7.0.1", when="@0.8.0 +strumpack", cuda_var=["cuda"])
+    xsdk_depends_on("strumpack@master" + strumpack_openmp, when="@develop +strumpack", cuda_var=["cuda"])
+    xsdk_depends_on("strumpack@7.0.1" + strumpack_openmp , when="@0.8.0 +strumpack", cuda_var=["cuda"])
     xsdk_depends_on("strumpack@6.1.0~slate~openmp", when="@0.7.0 +strumpack")
     xsdk_depends_on("strumpack@5.0.0~slate~openmp", when="@0.6.0 +strumpack")
     xsdk_depends_on("strumpack@3.3.0~slate~openmp", when="@0.5.0 +strumpack")
