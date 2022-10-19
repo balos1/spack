@@ -357,7 +357,7 @@ class Xsdk(BundlePackage, CudaPackage, ROCmPackage):
     xsdk_depends_on("amrex@18.10.1", when="@0.4.0 %gcc")
 
     xsdk_depends_on("slepc@main", when="@develop")
-    xsdk_depends_on("slepc@3.18.0", when="@0.8.0")
+    xsdk_depends_on("slepc@3.18.0", when="@0.8.0", cuda_var="cuda", rocm_var="rocm")
     xsdk_depends_on("slepc@3.16.0", when="@0.7.0")
     xsdk_depends_on("slepc@3.14.0", when="@0.6.0")
     xsdk_depends_on("slepc@3.12.0", when="@0.5.0")
