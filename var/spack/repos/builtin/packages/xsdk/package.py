@@ -467,8 +467,9 @@ class Xsdk(BundlePackage, CudaPackage, ROCmPackage):
     xsdk_depends_on("precice@2.1.1", when="@0.6.0 +precice")
     xsdk_depends_on("precice@1.6.1", when="@0.5.0 +precice")
 
+    bfpk_openmp = "~openmp" if sys.platform == "darwin" else "+openmp"
     xsdk_depends_on("butterflypack@master", when="@develop +butterflypack")
-    xsdk_depends_on("butterflypack@2.2.2", when="@0.8.0 +butterflypack")
+    xsdk_depends_on("butterflypack@2.2.2" + bfpk_openmp, when="@0.8.0 +butterflypack")
     xsdk_depends_on("butterflypack@2.0.0", when="@0.7.0 +butterflypack")
     xsdk_depends_on("butterflypack@1.2.1", when="@0.6.0 +butterflypack")
     xsdk_depends_on("butterflypack@1.1.0", when="@0.5.0 +butterflypack")
