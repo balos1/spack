@@ -432,7 +432,7 @@ class Xsdk(BundlePackage, CudaPackage, ROCmPackage):
     xsdk_depends_on("phist kernel_lib=tpetra", when="+trilinos +phist")
     xsdk_depends_on("phist kernel_lib=petsc", when="~trilinos +phist")
     xsdk_depends_on("phist@develop ~fortran ~scamac ~openmp ~host ~int64", when="@develop +phist")
-    xsdk_depends_on("phist@1.10.0 ~fortran ~scamac ~openmp ~host ~int64", when="@0.8.0 +phist")
+    xsdk_depends_on("phist@1.11.2 ~fortran ~scamac ~openmp ~host ~int64", when="@0.8.0 +phist")
     xsdk_depends_on("phist@1.9.5 ~fortran ~scamac ~openmp ~host ~int64", when="@0.7.0 +phist")
     xsdk_depends_on("phist@1.9.3 ~fortran ~scamac ~openmp ~host ~int64", when="@0.6.0 +phist")
     xsdk_depends_on("phist@1.8.0 ~fortran ~scamac ~openmp ~host ~int64", when="@0.5.0 +phist")
