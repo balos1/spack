@@ -212,13 +212,13 @@ class Xsdk(BundlePackage, CudaPackage, ROCmPackage):
     xsdk_depends_on("petsc +trilinos", when="+trilinos @:0.6.0")
     xsdk_depends_on("petsc +batch", when="platform=cray @0.5.0:")
     xsdk_depends_on(
-        "petsc@main+mpi+hypre+superlu-dist+metis+hdf5~mumps+double~int64+kokkos",
+        "petsc@main+mpi+hypre+superlu-dist+metis+hdf5~mumps+double~int64",
         when="@develop",
         cuda_var="cuda",
         rocm_var="rocm",
     )
     xsdk_depends_on(
-        "petsc@3.18.1+mpi+hypre+superlu-dist+metis+hdf5~mumps+double~int64+kokkos",
+        "petsc@3.18.1+mpi+hypre+superlu-dist+metis+hdf5~mumps+double~int64",
         when="@0.8.0",
         cuda_var="cuda",
         rocm_var="rocm",
