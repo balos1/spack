@@ -15,6 +15,7 @@ class Exago(CMakePackage, CudaPackage, ROCmPackage):
     git = "https://gitlab.pnnl.gov/exasgd/frameworks/exago.git"
     maintainers = ["ryandanehy", "CameronRutherford", "pelesh"]
 
+    version("1.5.0", branch="update/petsc-3.18.0", submodules=True)
     version(
         "1.4.1", commit="ea607c685444b5f345bfdc9a59c345f0f30adde2", submodules=True, preferred=True
     )
@@ -101,12 +102,14 @@ class Exago(CMakePackage, CudaPackage, ROCmPackage):
     depends_on("hiop@0.3.99:", when="@0.99:+hiop")
     depends_on("hiop@0.5.1:", when="@1.1.0:+hiop")
     depends_on("hiop@0.5.3:", when="@1.3.0:+hiop")
+    depends_on("hiop@0.7.0:", when="@1.5.0:+hiop")
 
     depends_on("hiop~mpi", when="+hiop~mpi")
     depends_on("hiop+mpi", when="+hiop+mpi")
 
     depends_on("petsc@3.13:3.14", when="@:1.2.99")
-    depends_on("petsc@3.16.0:3.16", when="@1.3.0:")
+    depends_on("petsc@3.16.0:3.16", when="@1.3.0:1.4")
+    depends_on("petsc@3.18.0:3.18", when="@1.5.0:")
     depends_on("petsc~mpi", when="~mpi")
 
     depends_on("py-pytest", type=("build", "run"), when="@1.4.1:+python")
