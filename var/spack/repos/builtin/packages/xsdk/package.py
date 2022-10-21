@@ -504,5 +504,5 @@ class Xsdk(BundlePackage, CudaPackage, ROCmPackage):
     xsdk_depends_on("exago@1.5.0", when="@0.8.0 +exago")
 
     xsdk_depends_on("hiop@develop", when="@develop +hiop")
-    xsdk_depends_on("hiop@0.7.0", when="@0.8.0 +hiop"
+    xsdk_depends_on("hiop@0.7.1", when="@0.8.0 +hiop"
 )
