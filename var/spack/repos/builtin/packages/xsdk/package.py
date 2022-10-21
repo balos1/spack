@@ -109,7 +109,7 @@ class Xsdk(BundlePackage, CudaPackage, ROCmPackage):
     variant("slate", default=(sys.platform != "darwin"), description="Enable slate package build")
     variant("arborx", default=True, description="Enable ArborX build")
     variant("exago", default=True, description="Enable exago build")
-    variant("hiop", default=(sys.platform != "darwin"), description="Enable hiop build")
+    variant("hiop", default=True, description="Enable hiop build")
 
     xsdk_depends_on("hypre@develop+superlu-dist+shared", when="@develop", cuda_var="cuda")
     xsdk_depends_on("hypre@2.26.0+superlu-dist+shared", when="@0.8.0", cuda_var="cuda")
