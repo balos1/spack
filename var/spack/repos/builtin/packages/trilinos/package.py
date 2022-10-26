@@ -452,7 +452,7 @@ class Trilinos(CMakePackage, CudaPackage, ROCmPackage):
     )
     patch(
         "https://patch-diff.githubusercontent.com/raw/trilinos/Trilinos/pull/11134.patch?full_index=1",
-        sha256="ce4fc14f9286799c932bd149f7ea61c672819c85f0385eef9c3d1b2d361bda77",
+        sha256="6d1bb2eb8963ef438ac4b548fb11b5dc1248cb99c3a6a59cd18a0fa966789ec2",
         when="@13.4.0 +superlu-dist",
     )
 
