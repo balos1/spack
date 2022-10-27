@@ -301,7 +301,7 @@ class Xsdk(BundlePackage, CudaPackage, ROCmPackage):
         rocm_var="rocm",
     )
     xsdk_depends_on(
-        "sundials@6.4.0~int64+hypre+petsc+superlu-dist",
+        "sundials@6.4.0~int64+hypre+petsc+superlu-dist+magma",
         when="@0.8.0",
         cuda_var="cuda",
         rocm_var="rocm",
