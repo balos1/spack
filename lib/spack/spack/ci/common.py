@@ -583,7 +583,7 @@ class SpackCIConfig:
                         "cd {env_dir}",
                         "spack env activate --without-view .",
                         "spack spec /$SPACK_JOB_SPEC_DAG_HASH",
-                        "spack -t -d ci rebuild",
+                        "spack --stacktrace -t -d ci rebuild",
                     ]
                 }
             },
