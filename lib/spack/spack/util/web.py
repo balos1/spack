@@ -354,7 +354,8 @@ def push_to_url(local_file_path, remote_path, keep_original=True, extra_args=Non
         tty.debug(f"      permissions = {stat.filemode(path.stat().st_mode)}")
 
         if keep_original:
-            shutil.copy(local_file_path, remote_file_path)
+            # shutil.copy(local_file_path, remote_file_path)
+            shutil.copyfile(local_file_path, remote_file_path)
         else:
             try:
                 rename(local_file_path, remote_file_path)
