@@ -337,10 +337,22 @@ def read_json(url: str):
 
 
 def push_to_url(local_file_path, remote_path, keep_original=True, extra_args=None):
+    from pathlib import Path
+    import stat
+
     remote_url = urllib.parse.urlparse(remote_path)
     if remote_url.scheme == "file":
         remote_file_path = url_util.local_file_path(remote_url)
-        mkdirp(os.path.dirname(remote_file_path))
+        tty.debug(f"CODY: remote_file_path is {remote_file_path}")
+        remote_dirname = os.path.dirname(remote_file_path)
+        path = Path(remote_dirname)
+        tty.debug(f"CODY: path dirname exists = {path.exists()}")
+        mkdirp(remote_dirname)
+        tty.debug(f"CODY: path dirname exists (after mkdirp) = {path.exists()}")
+        tty.debug(f"      owner       =       {path.owner()}")
+        tty.debug(f"      group       =       {path.group()}")
+        tty.debug(f"      permissions = {stat.filemode(path.stat().st_mode)}")
+
         if keep_original:
             shutil.copy(local_file_path, remote_file_path)
         else:
