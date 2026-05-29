@@ -363,7 +363,7 @@ def push_to_url(local_file_path, remote_path, keep_original=True, extra_args=Non
             shutil.copyfile(local_file_path, remote_file_path)
         else:
             try:
-                path = Path(local_file_path)
+                path = Path(os.path.dirname(local_file_path))
                 tty.debug(f"CODY: (rename path) local_file_path permissions:")
                 tty.debug(f"      owner       =       {path.owner()}")
                 tty.debug(f"      group       =       {path.group()}")
