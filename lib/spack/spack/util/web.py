@@ -355,7 +355,7 @@ def push_to_url(local_file_path, remote_path, keep_original=True, extra_args=Non
 
         if keep_original:
             path = Path(local_file_path)
-            tty.debug(f"CODY: local_file_path permissions:")
+            tty.debug(f"CODY: (copy path) local_file_path permissions:")
             tty.debug(f"      owner       =       {path.owner()}")
             tty.debug(f"      group       =       {path.group()}")
             tty.debug(f"      permissions = {stat.filemode(path.stat().st_mode)}")
@@ -363,6 +363,11 @@ def push_to_url(local_file_path, remote_path, keep_original=True, extra_args=Non
             shutil.copyfile(local_file_path, remote_file_path)
         else:
             try:
+                path = Path(local_file_path)
+                tty.debug(f"CODY: (rename path) local_file_path permissions:")
+                tty.debug(f"      owner       =       {path.owner()}")
+                tty.debug(f"      group       =       {path.group()}")
+                tty.debug(f"      permissions = {stat.filemode(path.stat().st_mode)}")
                 rename(local_file_path, remote_file_path)
             except OSError as e:
                 if e.errno == errno.EXDEV:
