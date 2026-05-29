@@ -581,7 +581,7 @@ class SpackCIConfig:
                     "script": [
                         "cd {env_dir}",
                         "spack env activate --without-view .",
-                        "spack ci rebuild",
+                        "spack -t -d ci rebuild",
                     ]
                 }
             },
