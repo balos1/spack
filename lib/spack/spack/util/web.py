@@ -354,6 +354,11 @@ def push_to_url(local_file_path, remote_path, keep_original=True, extra_args=Non
         tty.debug(f"      permissions = {stat.filemode(path.stat().st_mode)}")
 
         if keep_original:
+            path = Path(local_file_path)
+            tty.debug(f"CODY: local_file_path permissions:")
+            tty.debug(f"      owner       =       {path.owner()}")
+            tty.debug(f"      group       =       {path.group()}")
+            tty.debug(f"      permissions = {stat.filemode(path.stat().st_mode)}")
             # shutil.copy(local_file_path, remote_file_path)
             shutil.copyfile(local_file_path, remote_file_path)
         else:
