@@ -368,7 +368,8 @@ def push_to_url(local_file_path, remote_path, keep_original=True, extra_args=Non
                 tty.debug(f"      owner       =       {path.owner()}")
                 tty.debug(f"      group       =       {path.group()}")
                 tty.debug(f"      permissions = {stat.filemode(path.stat().st_mode)}")
-                rename(local_file_path, remote_file_path)
+                # rename(local_file_path, remote_file_path)
+                shutil.move(local_file_path, remote_file_path)
             except OSError as e:
                 if e.errno == errno.EXDEV:
                     # NOTE(opadron): The above move failed because it crosses
