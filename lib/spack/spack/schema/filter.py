@@ -11,7 +11,7 @@ from typing import Any, Dict
 
 import spack.schema.projections
 
-projection_scheme = spack.schema.projections.properties["projections"]
+projection_scheme = spack.schema.projections.projections
 
 allow_block = {
     "type": "object",
@@ -30,7 +30,7 @@ externals_filter = {
         "block": {
             "default": [],
             "oneOf": [
-                {"type": "boolean"},
+                {"const": True},
                 {"type": "array", "items": {"type": "string"}},
             ],
         },

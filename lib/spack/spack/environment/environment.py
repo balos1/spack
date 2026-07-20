@@ -12,8 +12,8 @@ import pathlib
 import re
 import shutil
 import stat
-import uuid
 import tempfile
+import uuid
 import warnings
 from collections.abc import KeysView
 from itertools import zip_longest
@@ -372,12 +372,8 @@ def create(
             string, it specifies the path to the view
         keep_relative: if True, develop paths are copied verbatim into the new environment file,
             otherwise they are made absolute
-<<<<<<< HEAD
-        include_concrete: concrete environment names/paths to be included
-=======
         include_concrete: list of concrete environment names/paths to be included
         filter_env: if True, create a filtered environment from init_file
->>>>>>> 455f88660c (first cut)
     """
     environment_dir = environment_dir_from_name(name, exists_ok=False)
     return create_in_dir(
@@ -484,10 +480,10 @@ def _is_lockfile_path(path: Union[str, pathlib.Path]) -> bool:
 def _default_filter_configuration() -> Dict[str, Any]:
     return {
         "projections": {"all": spack.spec.DISPLAY_FORMAT},
-        "concrete": False,
+        "concrete": True,
         "specs": {"allow": [], "block": []},
         "externals": {"allow": [], "block": []},
-        "config": {"allow": [], "block": ["filter", included_concrete_name]},
+        "config": {"allow": [], "block": ["filter", lockfile_include_key]},
     }
 
 
@@ -496,7 +492,7 @@ def _normalize_filter_configuration(configuration: Optional[Dict[str, Any]]) -> 
     if not configuration:
         return normalized
 
-    normalized["projections"] = dict(configuration.get("projections", {}))
+    normalized["projections"].update(configuration.get("projections", {}))
     normalized["concrete"] = configuration.get("concrete", True)
 
     specs = configuration.get("specs", {})
@@ -538,6 +534,18 @@ def _package_is_allowed(package_name: str, allow: Sequence[str], block: Sequence
     return allowed and not _package_matches_filter(package_name, block)
 
 
+def _external_spec_is_allowed(spec: Spec, filter_configuration: Dict[str, Any]) -> bool:
+    if not spec.external:
+        return True
+
+    allow = filter_configuration["externals"]["allow"]
+    block = filter_configuration["externals"]["block"]
+    if block is True:
+        return False
+
+    return _package_is_allowed(spec.name, allow, block)
+
+
 def _projection_format_for(spec: Spec, projections: Dict[str, str]) -> str:
     for matcher, format_string in projections.items():
         if matcher == "all":
@@ -552,12 +560,13 @@ def _filtered_concrete_root_entries(
 ) -> List[Tuple[str, Spec]]:
     return [
         (concrete.format(_projection_format_for(concrete, filter_configuration["projections"])), concrete)
-        for _, concrete in source_env.concretized_specs()
+        for concrete in source_env.all_specs_generator()
         if _spec_is_allowed(
             concrete,
             filter_configuration["specs"]["allow"],
             filter_configuration["specs"]["block"],
         )
+        and _external_spec_is_allowed(concrete, filter_configuration)
     ]
 
 
@@ -585,18 +594,12 @@ def _filter_packages_configuration(
     block_patterns = [] if block is True else block
 
     for package_name, package_configuration in packages_configuration.items():
+        if "externals" not in package_configuration:
+            continue
+        if block_all or not _package_is_allowed(package_name, allow, block_patterns):
+            continue
+
         filtered_package = copy.deepcopy(package_configuration)
-        has_external_settings = (
-            "externals" in filtered_package or filtered_package.get("buildable", True) is False
-        )
-
-        if has_external_settings and (
-            block_all or not _package_is_allowed(package_name, allow, block_patterns)
-        ):
-            filtered_package.pop("externals", None)
-            if filtered_package.get("buildable", True) is False:
-                filtered_package.pop("buildable", None)
-
         if filtered_package:
             result[package_name] = filtered_package
 
@@ -692,8 +695,11 @@ def _set_filtered_manifest(env: "Environment", configuration: Dict[str, Any]) ->
 def _populate_filtered_lockfile(
     env: "Environment", filtered_roots: Sequence[Tuple[str, Spec]]
 ) -> None:
+    add_concrete_spec = getattr(env, "add_concrete_spec", None) or getattr(
+        env, "_add_concrete_spec"
+    )
     for abstract_spec, concrete_spec in filtered_roots:
-        env._add_concrete_spec(Spec(abstract_spec), concrete_spec)
+        add_concrete_spec(Spec(abstract_spec), concrete_spec)
     env.write(regenerate=False)
 
 

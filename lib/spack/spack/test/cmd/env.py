@@ -2090,6 +2090,65 @@ def test_env_create_filter_rejects_lockfile(tmp_path: pathlib.Path):
         env("create", "--filter", "filtered", source.lock_path)
 
 
+def test_env_create_filter_defaults_to_concrete_allow_all():
+    env("create", "source")
+    source = ev.read("source")
+    with source:
+        add("mpileaks")
+        add("libelf")
+    source.concretize()
+    source.write()
+
+    env("create", "--filter", "filtered", "source")
+
+    filtered = ev.read("filtered")
+    filtered_yaml = filtered.manifest["spack"]
+
+    assert {"callpath", "libelf", "mpileaks"}.issubset(
+        spec.name for spec in filtered.user_specs
+    )
+    assert {"callpath", "libelf", "mpileaks"}.issubset(
+        spec.name for spec in filtered.concrete_roots()
+    )
+    assert os.path.exists(filtered.lock_path)
+    assert "filter" not in filtered_yaml
+
+
+def test_env_create_filter_can_select_concrete_dependency():
+    env("create", "source")
+    source = ev.read("source")
+    with source:
+        add("mpileaks")
+        config("add", "filter:specs:allow:[callpath]")
+    source.concretize()
+    source.write()
+
+    env("create", "--filter", "filtered", "source")
+
+    filtered = ev.read("filtered")
+
+    assert [spec.name for spec in filtered.user_specs] == ["callpath"]
+    assert [spec.name for spec in filtered.concrete_roots()] == ["callpath"]
+
+
+def test_env_create_filter_blocks_external_concrete_specs():
+    env("create", "source")
+    source = ev.read("source")
+    with source:
+        add("externaltool")
+        config("add", "filter:specs:allow:[externaltool]")
+        config("add", "filter:externals:block:true")
+    source.concretize()
+    source.write()
+
+    env("create", "--filter", "filtered", "source")
+
+    filtered = ev.read("filtered")
+
+    assert list(filtered.user_specs) == []
+    assert not filtered.concrete_roots()
+
+
 def test_env_create_filter_from_concrete_env():
     env("create", "source")
     source = ev.read("source")
@@ -2125,10 +2184,8 @@ def test_env_create_filter_from_concrete_env():
     assert [spec.name for spec in filtered.user_specs] == ["mpileaks"]
     assert [spec.name for spec in filtered.concrete_roots()] == ["mpileaks"]
     assert "filter" not in filtered_yaml
-    assert "all" in filtered_yaml["packages"]
-    assert "cmake" in filtered_yaml["packages"]
+    assert list(filtered_yaml["packages"]) == ["cmake"]
     assert "externals" in filtered_yaml["packages"]["cmake"]
-    assert "libelf" not in filtered_yaml["packages"] or "externals" not in filtered_yaml["packages"]["libelf"]
 
     with open(filtered.lock_path, encoding="utf-8") as stream:
         lockfile = filtered._read_lockfile(stream)
@@ -2162,7 +2219,8 @@ def test_env_create_filter_from_manifest(tmp_path: pathlib.Path):
 
     assert [spec.name for spec in filtered.user_specs] == ["libelf"]
     assert not os.path.exists(filtered.lock_path)
-    assert "packages" in filtered_yaml
+    assert "all" not in filtered_yaml.get("packages", {})
+    assert all("externals" in pkg for pkg in filtered_yaml.get("packages", {}).values())
     assert "filter" not in filtered_yaml
 
 
