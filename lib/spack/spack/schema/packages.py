@@ -262,9 +262,13 @@ properties: Dict[str, Any] = {
                             "id": {"type": "string"},
                             "extra_attributes": {
                                 "type": "object",
+<<<<<<< HEAD
                                 "description": "Additional information needed by the package "
                                 "to use this external",
                                 "additionalProperties": {"type": "string"},
+=======
+                                "additionalProperties": True,
+>>>>>>> 455f88660c (first cut)
                                 "properties": {
                                     "compilers": {
                                         "type": "object",
