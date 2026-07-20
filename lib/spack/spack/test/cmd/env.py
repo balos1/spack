@@ -2316,6 +2316,34 @@ def test_env_create_filter_from_manifest(tmp_path: pathlib.Path):
     assert "filter" not in filtered_yaml
 
 
+def test_env_create_filter_reads_filter_from_include(tmp_path: pathlib.Path):
+    filter_yaml = tmp_path / "filter.yaml"
+    filter_yaml.write_text(
+        """filter:
+  concrete: false
+  specs:
+    allow: [libelf]
+"""
+    )
+    spack_yaml = tmp_path / "spack.yaml"
+    spack_yaml.write_text(
+        f"""spack:
+  specs:
+  - mpileaks
+  - libelf
+  include:
+  - {filter_yaml}
+"""
+    )
+
+    env("create", "--filter", "filtered", str(spack_yaml))
+
+    filtered = ev.read("filtered")
+
+    assert [spec.name for spec in filtered.user_specs] == ["libelf"]
+    assert not os.path.exists(filtered.lock_path)
+
+
 def test_env_create_filter_manifest_requires_non_concrete(tmp_path: pathlib.Path):
     spack_yaml = tmp_path / "spack.yaml"
     spack_yaml.write_text(

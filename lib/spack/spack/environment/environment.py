@@ -517,6 +517,11 @@ def _normalize_filter_configuration(configuration: Optional[Dict[str, Any]]) -> 
     return normalized
 
 
+def _source_filter_configuration(source_env: "Environment") -> Dict[str, Any]:
+    with source_env:
+        return _normalize_filter_configuration(spack.config.get("filter"))
+
+
 def _matches_any_spec(spec: Spec, patterns: Sequence[str]) -> bool:
     return any(spec.satisfies(Spec(pattern)) for pattern in patterns)
 
@@ -724,9 +729,7 @@ def _create_filtered_environment_in_dir(
         )
 
     with _filtered_source_environment(init_file) as (source_env, source_path, is_source_dir):
-        filter_configuration = _normalize_filter_configuration(
-            source_env.manifest[TOP_LEVEL_KEY].get("filter")
-        )
+        filter_configuration = _source_filter_configuration(source_env)
 
         if filter_configuration["concrete"]:
             if not is_source_dir:
