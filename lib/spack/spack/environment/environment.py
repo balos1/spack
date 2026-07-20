@@ -504,10 +504,14 @@ def _normalize_filter_configuration(configuration: Optional[Dict[str, Any]]) -> 
     normalized["externals"]["block"] = externals.get("block", [])
 
     config = configuration.get("config", {})
-    normalized["config"]["allow"] = list(config.get("allow", []))
+    config_allow = list(config.get("allow", []))
+    config_block = list(config.get("block", []))
+    default_config_block = _default_filter_configuration()["config"]["block"]
+    normalized["config"]["allow"] = config_allow
     normalized["config"]["block"] = list(
         dict.fromkeys(
-            list(config.get("block", [])) + _default_filter_configuration()["config"]["block"]
+            config_block
+            + [section for section in default_config_block if section not in config_allow]
         )
     )
     return normalized

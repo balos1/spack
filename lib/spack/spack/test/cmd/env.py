@@ -2131,6 +2131,36 @@ def test_env_create_filter_can_select_concrete_dependency():
     assert [spec.name for spec in filtered.concrete_roots()] == ["callpath"]
 
 
+def test_env_create_filter_can_copy_default_blocked_sections(tmp_path: pathlib.Path):
+    env("create", "included")
+    included = ev.read("included")
+    with included:
+        add("libelf")
+    included.concretize()
+    included.write()
+
+    spack_yaml = tmp_path / "spack.yaml"
+    spack_yaml.write_text(
+        f"""spack:
+  specs:
+  - mpileaks
+  {ev.lockfile_include_key}:
+  - {included.path}
+  filter:
+    concrete: false
+    config:
+      allow: [filter, {ev.lockfile_include_key}]
+"""
+    )
+
+    env("create", "--filter", "filtered", str(spack_yaml))
+
+    filtered_yaml = ev.read("filtered").manifest["spack"]
+
+    assert filtered_yaml["filter"]["concrete"] is False
+    assert filtered_yaml[ev.lockfile_include_key] == [included.path]
+
+
 def test_env_create_filter_blocks_external_concrete_specs():
     env("create", "source")
     source = ev.read("source")
@@ -2191,6 +2221,68 @@ def test_env_create_filter_from_concrete_env():
         lockfile = filtered._read_lockfile(stream)
 
     assert [Spec(root["spec"]).name for root in lockfile["roots"]] == ["mpileaks"]
+
+
+def test_env_create_filter_packages_blocked_when_externals_blocked():
+    env("create", "source")
+    source = ev.read("source")
+    with source:
+        add("mpileaks")
+        spack.config.set(
+            "packages",
+            {
+                "all": {"compiler": ["gcc"]},
+                "cmake": {
+                    "externals": [{"spec": "cmake@3.27.0", "prefix": "/tmp/cmake"}],
+                    "buildable": False,
+                },
+            },
+            scope=source.scope_name,
+        )
+        config("add", "filter:config:allow:[packages]")
+        config("add", "filter:externals:block:true")
+    source.concretize()
+    source.write()
+
+    env("create", "--filter", "filtered", "source")
+
+    filtered_yaml = ev.read("filtered").manifest["spack"]
+
+    assert "packages" not in filtered_yaml
+
+
+def test_env_create_filter_packages_include_selected_externals():
+    env("create", "source")
+    source = ev.read("source")
+    with source:
+        add("mpileaks")
+        spack.config.set(
+            "packages",
+            {
+                "all": {"compiler": ["gcc"]},
+                "cmake": {
+                    "externals": [{"spec": "cmake@3.27.0", "prefix": "/tmp/cmake"}],
+                    "buildable": False,
+                },
+                "libelf": {
+                    "externals": [{"spec": "libelf@0.8.13", "prefix": "/tmp/libelf"}],
+                    "buildable": False,
+                },
+                "mpileaks": {"require": ["+debug"]},
+            },
+            scope=source.scope_name,
+        )
+        config("add", "filter:config:allow:[packages]")
+        config("add", "filter:externals:allow:[cmake,libelf]")
+    source.concretize()
+    source.write()
+
+    env("create", "--filter", "filtered", "source")
+
+    filtered_yaml = ev.read("filtered").manifest["spack"]
+
+    assert set(filtered_yaml["packages"]) == {"cmake", "libelf"}
+    assert all("externals" in pkg for pkg in filtered_yaml["packages"].values())
 
 
 def test_env_create_filter_from_manifest(tmp_path: pathlib.Path):
