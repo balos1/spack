@@ -489,7 +489,7 @@ def _default_filter_configuration() -> Dict[str, Any]:
     }
 
 
-def _normalize_filter_configuration(configuration: Optional[Dict[str, Any]]) -> Dict[str, Any]:
+def _normalized_filter_configuration(configuration: Optional[Dict[str, Any]]) -> Dict[str, Any]:
     normalized = _default_filter_configuration()
     if not configuration:
         return normalized
@@ -537,7 +537,7 @@ def _read_filter_configuration(filter_file: Union[str, pathlib.Path]) -> Dict[st
             f"filter configuration file must contain a top-level filter section: {filter_path}"
         )
 
-    return _merged_scope_filter_configuration(data["filter"])
+    return _normalized_filter_configuration(data["filter"])
 
 
 def _matches_any_spec(spec: Spec, patterns: Sequence[str]) -> bool:
@@ -657,7 +657,7 @@ def _filtered_configuration(
     with source_env:
         if include_section("packages"):
             filtered_packages = _filter_packages_configuration(
-                spack.config.get("packages") or {}, filter_configuration
+                source_configuration.get("packages", {}), filter_configuration
             )
         else:
             filtered_packages = {}
